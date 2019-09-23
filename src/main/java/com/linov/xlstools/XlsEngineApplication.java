@@ -1,13 +1,13 @@
-package com.linov.excelengine;
+package com.linov.xlstools;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ExcelEngineApplication {
+public class XlsEngineApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ExcelEngineApplication.class, args);
+		SpringApplication.run(XlsEngineApplication.class, args);
 	}
 
 }
