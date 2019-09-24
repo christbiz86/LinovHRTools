@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.linov.xlstools.pojo.XlsReportPOJO;
-import com.linov.xlstools.xlstools.XlsReader;
-import com.linov.xlstools.xlstools.XlsWriter;
+import com.linov.xlstools.tools.XlsReader;
+import com.linov.xlstools.tools.XlsWriter;
 
 @CrossOrigin(origins = "*")
 @Controller
@@ -42,10 +42,11 @@ public class XlsController {
 
 	@PostMapping(value = "/read")
 	public ResponseEntity<?> readReportXls(@RequestParam("file") MultipartFile file, 
-			@RequestParam("start") String startCell, @RequestParam("end") String endCell) {
+			@RequestParam("start") String startCell, @RequestParam("end") String endCell,
+			@RequestParam(value = "sheet", required = false) String sheetName) {
 		try {
 			InputStream inputStream =  new BufferedInputStream(file.getInputStream());
-			return ResponseEntity.status(HttpStatus.OK).body(xlsReader.readXls(inputStream, startCell, endCell));
+			return ResponseEntity.status(HttpStatus.OK).body(xlsReader.readXls(inputStream, sheetName, startCell, endCell));
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("F");

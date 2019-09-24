@@ -1,4 +1,4 @@
-package com.linov.xlstools.xlstools;
+package com.linov.xlstools.tools;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -55,10 +55,6 @@ public class XlsWriter {
 			Cell headerCell = row.createCell(0);
 			headerCell.setCellValue(rptHeader.get(i));
 			headerCell.setCellStyle(headerStyle);
-			if (maxColumnIndex < row.getLastCellNum() + 1) {
-				maxColumnIndex = row.getLastCellNum() - 1;
-			};
-			
 			rowIndex++;
 		}
 		rowIndex++;
@@ -77,6 +73,10 @@ public class XlsWriter {
 
 	private void createGridHeader(List<String> gridHeader) {
 		Row row = sheet.createRow(rowIndex);
+
+		if (maxColumnIndex < row.getLastCellNum()) {
+			maxColumnIndex = row.getLastCellNum() - 1;
+		};
 		
 		for (Integer i = 0; i < gridHeader.size(); i++) {
 			CellStyle style = stylizeGridHeader(i, gridHeader.size());
@@ -84,10 +84,6 @@ public class XlsWriter {
 			Cell cell = row.createCell(i);
 			cell.setCellValue(gridHeader.get(i));
 			cell.setCellStyle(style);
-			if (maxColumnIndex < row.getLastCellNum() + 1) {
-				maxColumnIndex = row.getLastCellNum() - 1;
-			};
-			
 		}
 		rowIndex++;
 	}
@@ -95,11 +91,11 @@ public class XlsWriter {
 	private CellStyle stylizeGridHeader(Integer currentColumn, Integer maxColumn) {
 		CellStyle style = workbook.createCellStyle();
 
-		if (currentColumn == 0) {
-			style.setBorderTop(BorderStyle.THIN);
+		if (isLeftMost(currentColumn)) {
 			style.setBorderBottom(BorderStyle.THIN);
 			style.setBorderLeft(BorderStyle.THIN);
-		} else if (currentColumn == maxColumn - 1) {
+			style.setBorderTop(BorderStyle.THIN);
+		} else if (isRightMost(currentColumn, maxColumn)) {
 			style.setBorderTop(BorderStyle.THIN);
 			style.setBorderBottom(BorderStyle.THIN);
 			style.setBorderRight(BorderStyle.THIN);
@@ -116,6 +112,14 @@ public class XlsWriter {
 		return style;
 	}
 
+	private boolean isRightMost(Integer currentColumn, Integer maxColumn) {
+		return currentColumn == maxColumn - 1;
+	}
+
+	private boolean isLeftMost(Integer currentColumn) {
+		return currentColumn == 0;
+	}
+
 	private void createContent(List<String[]> content) {
 		
 		for (Integer i = 0; i < content.size(); i++) {
@@ -127,9 +131,6 @@ public class XlsWriter {
 				Cell cell = row.createCell(j);
 				cell.setCellValue(value);
 				cell.setCellStyle(style);
-				if (maxColumnIndex < row.getLastCellNum() + 1) {
-					maxColumnIndex = row.getLastCellNum() - 1;
-				};
 				j++;
 			}
 			
@@ -140,26 +141,32 @@ public class XlsWriter {
 	private CellStyle stylizeContent(Integer currentRow, Integer currentColumn, Integer maxRow, Integer maxColumn) {
 		CellStyle style = workbook.createCellStyle();
 
-		if (currentRow == 0 && currentColumn == 0) {
-			style.setBorderTop(BorderStyle.THIN);
-			style.setBorderLeft(BorderStyle.THIN);
-		} else if (currentRow == 0 && currentColumn < maxColumn - 1) {
-			style.setBorderTop(BorderStyle.THIN);
-		} else if (currentRow == 0 && currentColumn == maxColumn - 1) {
-			style.setBorderTop(BorderStyle.THIN);
-			style.setBorderRight(BorderStyle.THIN);
-		} else if (currentRow == maxRow - 1 && currentColumn == 0) {
-			style.setBorderBottom(BorderStyle.THIN);
-			style.setBorderLeft(BorderStyle.THIN);
-		} else if (currentRow == maxRow - 1 && currentColumn < maxColumn - 1) {
-			style.setBorderBottom(BorderStyle.THIN);
-		} else if (currentRow == maxRow - 1 && currentColumn == maxColumn - 1) {
-			style.setBorderBottom(BorderStyle.THIN);
-			style.setBorderRight(BorderStyle.THIN);
-		} else if (currentRow < maxRow - 1 && currentColumn == 0) {
-			style.setBorderLeft(BorderStyle.THIN);
-		} else if (currentRow < maxRow - 1 && currentColumn == maxColumn - 1) {
-			style.setBorderRight(BorderStyle.THIN);
+		if (isTopMost(currentRow)) {
+			if (isLeftMost(currentColumn)) {
+				style.setBorderTop(BorderStyle.THIN);
+				style.setBorderLeft(BorderStyle.THIN);
+			} else if (currentColumn < maxColumn - 1) {
+				style.setBorderTop(BorderStyle.THIN);
+			} else if (isRightMost(currentColumn, maxColumn)) {
+				style.setBorderTop(BorderStyle.THIN);
+				style.setBorderRight(BorderStyle.THIN);
+			}
+		} else if (isBottomMost(currentRow, maxRow)) { 
+			if (isLeftMost(currentColumn)) {
+				style.setBorderBottom(BorderStyle.THIN);
+				style.setBorderLeft(BorderStyle.THIN);
+			} else if (currentColumn < maxColumn - 1) {
+				style.setBorderBottom(BorderStyle.THIN);
+			} else if (isRightMost(currentColumn, maxColumn)) {
+				style.setBorderBottom(BorderStyle.THIN);
+				style.setBorderRight(BorderStyle.THIN);
+			}
+		} else {
+			if (isLeftMost(currentColumn)) {
+				style.setBorderLeft(BorderStyle.THIN);
+			} else if (isRightMost(currentColumn, maxColumn)) {
+				style.setBorderRight(BorderStyle.THIN);
+			}
 		}
 
 		XSSFFont font = ((XSSFWorkbook) workbook).createFont();
@@ -169,6 +176,14 @@ public class XlsWriter {
 		
 		style.setWrapText(true);
 		return style;
+	}
+
+	private boolean isBottomMost(Integer currentRow, Integer maxRow) {
+		return currentRow == maxRow - 1;
+	}
+
+	private boolean isTopMost(Integer currentRow) {
+		return currentRow == 0;
 	}
 
 	private void createFooter() {
