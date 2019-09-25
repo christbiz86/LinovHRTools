@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.linov.xlstools.pojo.XlsReportPOJO;
 import com.linov.xlstools.tools.XlsReader;
 import com.linov.xlstools.tools.XlsWriter;
+import com.linov.xlstools.tools.model.ExcelReport;
 
 @CrossOrigin(origins = "*")
 @Controller
@@ -33,9 +34,11 @@ public class XlsController {
 	@PostMapping(value = "/write")
 	public ResponseEntity<?> generateReportXls(@RequestBody XlsReportPOJO xlsReportPOJO) {
 		try {
-			xlsWriter.writeXls(xlsReportPOJO);
+			ExcelReport report = new ExcelReport("ReportTest");
+			xlsWriter.writeXls(report, xlsReportPOJO);
 			return ResponseEntity.status(HttpStatus.OK).body("Success");
 		} catch (Exception e) {
+			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("F");
 		}
 	}
