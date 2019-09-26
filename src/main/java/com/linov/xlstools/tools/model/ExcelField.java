@@ -2,6 +2,7 @@ package com.linov.xlstools.tools.model;
 
 import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.CellStyle;
 
 public class ExcelField {
 	
@@ -11,6 +12,7 @@ public class ExcelField {
 	
 	protected ExcelField (HSSFWorkbook workbook, String name) {
 		this.name = name;
+		this.style = new ExcelStyle(workbook);
 		this.font = workbook.createFont();
 	}
 	
@@ -22,6 +24,9 @@ public class ExcelField {
 	}
 	public ExcelStyle getStyle() {
 		return style;
+	}
+	protected CellStyle getCellStyle() {
+		return style.getCellStyle();
 	}
 	public void setStyle(ExcelStyle excelStyle) {
 		this.style = excelStyle;

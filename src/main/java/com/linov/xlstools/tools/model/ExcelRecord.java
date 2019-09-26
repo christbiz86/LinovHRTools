@@ -25,6 +25,10 @@ public class ExcelRecord {
 		return values;
 	}
 	
+	public Integer size() {
+		return values.size();
+	}
+	
 	public ExcelText getValueOf(String key) {
 		return this.values.get(key);
 	}

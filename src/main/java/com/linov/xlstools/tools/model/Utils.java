@@ -1,11 +1,6 @@
 package com.linov.xlstools.tools.model;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.time.LocalDate;
-import java.util.Calendar;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -22,17 +17,23 @@ public class Utils {
 
 	private Integer rowIndex;
 	private HSSFWorkbook workbook;
-	private Sheet sheet;
-	
-	public Utils(HSSFWorkbook workbook) {
-		this.workbook = workbook;
-		
-	}
 
-	public void createReportHeader(ExcelHeader header) {
-		
+	public Utils() {
+		this.rowIndex = 0;
+	}
+	
+	public void generateWorkbook(HSSFWorkbook workbook, List<ExcelSheet> sheets) {
+		for (ExcelSheet excelSheet : sheets) {
+			Sheet sheet = workbook.createSheet(excelSheet.getName());
+			generateReportHeader(sheet, excelSheet.getHeader());
+			generateTable(sheet, excelSheet.getTable());
+			generateFooter(sheet, excelSheet.getFooter());
+		}
+	}
+	
+	public void generateReportHeader(Sheet sheet, ExcelHeader header) {
 		for (int i = 0; i < header.getTexts().size(); i++) {
-			Row row = this.sheet.createRow(this.rowIndex);
+			Row row = sheet.createRow(this.rowIndex);
 			ExcelText text = header.getText(i);
 			Cell cell = row.createCell(0);
 			setCellValue(text, cell);
@@ -58,22 +59,26 @@ public class Utils {
 		}
 	}
 
-	public void createGridHeader(List<String> gridHeader) {
-		Row row = this.sheet.createRow(this.rowIndex);
+	private void generateTable(Sheet sheet, ExcelTable table) {
+		generateField(sheet, table.getFields());
+		generateRecords(sheet, table.getRecords());
+	}
 
-		for (Integer i = 0; i < gridHeader.size(); i++) {
-			CellStyle style = setFieldBorder(i, gridHeader.size());
+	public void generateField(Sheet sheet, List<ExcelField> fields) {
+		Row row = sheet.createRow(this.rowIndex);
+
+		for (Integer i = 0; i < fields.size(); i++) {
+			CellStyle style = fields.get(i).getCellStyle();
+			setFieldBorder(style, i, fields.size());
 			
 			Cell cell = row.createCell(i);
-			cell.setCellValue(gridHeader.get(i));
+			cell.setCellValue(fields.get(i).getName());
 			cell.setCellStyle(style);
 		}
 		this.rowIndex++;
 	}
 
-	public CellStyle setFieldBorder(Integer currentColumn, Integer maxColumn) {
-		CellStyle style = this.workbook.createCellStyle();
-
+	public void setFieldBorder(CellStyle style, Integer currentColumn, Integer maxColumn) {
 		if (isLeftMost(currentColumn)) {
 			style.setBorderBottom(BorderStyle.THIN);
 			style.setBorderLeft(BorderStyle.THIN);
@@ -86,8 +91,6 @@ public class Utils {
 			style.setBorderTop(BorderStyle.THIN);
 			style.setBorderBottom(BorderStyle.THIN);
 		}
-		
-		return style;
 	}
 
 	public boolean isRightMost(Integer currentColumn, Integer maxColumn) {
@@ -98,27 +101,27 @@ public class Utils {
 		return currentColumn == 0;
 	}
 
-	public void createContent(List<String[]> content) {
-		
-		for (Integer i = 0; i < content.size(); i++) {
-			Row row = this.sheet.createRow(this.rowIndex);
-			Integer j = 0;
+	public void generateRecords(Sheet sheet, List<ExcelRecord> records) {
+		for (ExcelRecord record : records) {
+			Row row = sheet.createRow(this.rowIndex);
 			
-			for (String value : content.get(i)) {
-				CellStyle style = stylizeContent(i, j, content.size(), content.get(i).length);
-				Cell cell = row.createCell(j);
-				cell.setCellValue(value);
-				cell.setCellStyle(style);
+			for (Integer j = 0; j < record.size(); j++) {
+				List<ExcelText> mapRecord= new ArrayList<ExcelText>(record.get().values());
+				
+				for (ExcelText text : mapRecord) {
+					CellStyle style = text.getCellStyle();
+					setRecordsBorder(style, row.getRowNum(), j, records.size(), record.size());
+					Cell cell = row.createCell(j);
+					setCellValue(text, cell);
+					cell.setCellStyle(style);
+				}
 				j++;
 			}
-			
 			this.rowIndex++;
 		}
 	}
 
-	public CellStyle stylizeContent(Integer currentRow, Integer currentColumn, Integer maxRow, Integer maxColumn) {
-		CellStyle style = this.workbook.createCellStyle();
-
+	public CellStyle setRecordsBorder(CellStyle style, Integer currentRow, Integer currentColumn, Integer maxRow, Integer maxColumn) {
 		if (isTopMost(currentRow)) {
 			if (isLeftMost(currentColumn)) {
 				style.setBorderTop(BorderStyle.THIN);
@@ -146,11 +149,6 @@ public class Utils {
 				style.setBorderRight(BorderStyle.THIN);
 			}
 		}
-
-		HSSFFont font = ((HSSFWorkbook) this.workbook).createFont();
-		font.setFontName("Arial");
-		font.setFontHeightInPoints((short) 12);
-		style.setFont(font);
 		
 		style.setWrapText(true);
 		return style;
@@ -164,28 +162,15 @@ public class Utils {
 		return currentRow == 0;
 	}
 
-	public void createFooter(List<String> footer) {
-		CellStyle footerStyle = stylizeRptHeader();
-		
-		for (int i = 0; i < footer.size(); i++) {
-			Row row = this.sheet.createRow(this.rowIndex);
-
-			Cell footerCell = row.createCell(0);
-			footerCell.setCellValue(footer.get(i));
-			footerCell.setCellStyle(footerStyle);
+	public void generateFooter(Sheet sheet, ExcelFooter footer) {
+		for (int i = 0; i < footer.getTexts().size(); i++) {
+			Row row = sheet.createRow(this.rowIndex);
+			ExcelText text = footer.getText(i);
+			Cell cell = row.createCell(0);
+			setCellValue(text, cell);
+			cell.setCellStyle(footer.getText(i).getCellStyle());
 			this.rowIndex++;
 		}
 		this.rowIndex++;
 	}
-	
-	public void createFile(String fileName) throws FileNotFoundException, IOException {
-		File currDir = new File(".");
-		String path = currDir.getAbsolutePath();
-		String fileLocation = path.substring(0, path.length() - 1) + fileName + ".xlsx";
-
-		FileOutputStream outputStream = new FileOutputStream(fileLocation);
-		this.workbook.write(outputStream);
-		this.workbook.close();
-	}
-
 }

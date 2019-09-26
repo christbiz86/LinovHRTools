@@ -18,6 +18,7 @@ public class ExcelText {
 	
 	public ExcelText(HSSFWorkbook workbook, Object value) {
 		setTextValue(value);
+		this.style = new ExcelStyle(workbook);
 	}
 	
 	private void setTextValue(Object value) {

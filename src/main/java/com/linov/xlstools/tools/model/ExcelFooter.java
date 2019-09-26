@@ -12,19 +12,23 @@ public class ExcelFooter {
 
 	public ExcelFooter(HSSFWorkbook workbook) {
 		this.workbook = workbook;
-		texts = new ArrayList<ExcelText>();
+		this.texts = new ArrayList<ExcelText>();
 	}
 
+	public void addText(Object value) {
+		ExcelText text = new ExcelText(this.workbook, value);
+		this.texts.add(text);
+	}
+
+	public ExcelText getText(Integer index) {
+		return texts.get(index);
+	}
+	
 	public List<ExcelText> getTexts() {
 		return texts;
 	}
 
 	public void setTexts(List<ExcelText> texts) {
 		this.texts = texts;
-	}
-
-	public void addText(Object value) {
-		ExcelText text = new ExcelText(this.workbook, value);
-		this.texts.add(text);
 	}
 }
