@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
@@ -11,17 +12,12 @@ public class ExcelReport {
 
 	private HSSFWorkbook workbook;
 	private String fileName;
-	private ExcelHeader header;
-	private ExcelTable table;
-	private ExcelFooter footer;
+	private List<ExcelSheet> sheets;
 	private Utils utils;
 	
 	public ExcelReport(String fileName) {
 		this.workbook = new HSSFWorkbook();
 		this.fileName = fileName;
-		this.header = new ExcelHeader(this.workbook);;
-		this.table = new ExcelTable(this.workbook);
-		this.footer = new ExcelFooter(this.workbook);
 		this.utils = new Utils(this.workbook);
 	}
 
@@ -46,17 +42,5 @@ public class ExcelReport {
 		this.fileName = fileName;
 	}
 
-	public ExcelHeader getHeader() {
-		return header;
-	}
-
-	public ExcelTable getTable() {
-		return table;
-	}
-
-	public ExcelFooter getFooter() {
-		return footer;
-	}
-	
 	
 }

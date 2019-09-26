@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.poi.hssf.usermodel.HSSFFont;
@@ -11,6 +14,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.RichTextString;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
@@ -22,17 +26,35 @@ public class Utils {
 	
 	public Utils(HSSFWorkbook workbook) {
 		this.workbook = workbook;
+		
 	}
 
 	public void createReportHeader(ExcelHeader header) {
 		
 		for (int i = 0; i < header.getTexts().size(); i++) {
 			Row row = this.sheet.createRow(this.rowIndex);
-
-			Cell headerCell = row.createCell(0);
-			headerCell.setCellValue(header.getText(i).getValue());
-			headerCell.setCellStyle(header.getText(i).getCellStyle());
+			ExcelText text = header.getText(i);
+			Cell cell = row.createCell(0);
+			setCellValue(text, cell);
+			cell.setCellStyle(header.getText(i).getCellStyle());
 			this.rowIndex++;
+		}
+	}
+
+	private void setCellValue(ExcelText text, Cell cell) {
+		switch (text.getValueType()) {
+		case NUMERIC:
+			cell.setCellValue((Double) text.getValue());
+			break;
+		case DATE:
+			cell.setCellValue((Date) text.getValue());
+			break;
+		case BOOLEAN:
+			cell.setCellValue((Boolean) text.getValue());
+			break;
+		default:
+			cell.setCellValue((String) text.getValue());
+			break;
 		}
 	}
 
