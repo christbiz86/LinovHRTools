@@ -16,13 +16,15 @@ public class ExcelText {
 	private ExcelStyle style;
 	private HSSFFont font;
 	
-	public ExcelText(HSSFWorkbook workbook, Object value) {
+	protected ExcelText(HSSFWorkbook workbook, Object value) {
 		setTextValue(value);
 		this.style = new ExcelStyle(workbook);
 	}
 	
 	private void setTextValue(Object value) {
-		if (value.getClass() == LocalDateTime.class) {
+		if (value == null) {
+			this.value = value;
+		} else if (value.getClass() == LocalDateTime.class) {
 			this.value = Date.from(((LocalDateTime) value).atZone(ZoneId.systemDefault()).toInstant());
 		} else if (value.getClass() == LocalDate.class) {
 			this.value = Date.from(((LocalDate) value).atStartOfDay(ZoneId.systemDefault()).toInstant());
@@ -32,7 +34,9 @@ public class ExcelText {
 	}
 
 	public ValueType getValueType() {
-		if (this.value.getClass() == Integer.class || this.value.getClass() == Double.class
+		if (this.value == null) {
+			return ValueType.NULL;
+		} else if (this.value.getClass() == Integer.class || this.value.getClass() == Double.class
 				|| this.value.getClass() == Float.class || this.value.getClass() == Long.class) {
 			return ValueType.NUMERIC;
 		} else if (this.value.getClass() == Date.class || this.value.getClass() == LocalDateTime.class
@@ -70,6 +74,7 @@ public class ExcelText {
 	}
 
 	public enum ValueType {
+		NULL,
 		STRING,
 		NUMERIC,
 		DATE,

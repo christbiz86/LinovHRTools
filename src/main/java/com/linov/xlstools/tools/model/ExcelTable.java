@@ -11,7 +11,7 @@ public class ExcelTable {
 	private List<ExcelField> fields;
 	private List<ExcelRecord> records;
 	
-	public ExcelTable(HSSFWorkbook workbook) {
+	protected ExcelTable(HSSFWorkbook workbook) {
 		this.workbook = workbook;
 		this.fields = new ArrayList<ExcelField>();
 		this.records = new ArrayList<ExcelRecord>();
@@ -35,6 +35,9 @@ public class ExcelTable {
 		this.fields.add(field);
 	}
 
+	public ExcelRecord getRecord(Integer i) {
+		return records.get(i);
+	}
 	public List<ExcelRecord> getRecords() {
 		return records;
 	}

@@ -2,6 +2,7 @@ package com.linov.xlstools.controller;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,18 +13,17 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.linov.xlstools.pojo.XlsReportPOJO;
 import com.linov.xlstools.tools.XlsReader;
 import com.linov.xlstools.tools.model.ExcelFooter;
 import com.linov.xlstools.tools.model.ExcelHeader;
 import com.linov.xlstools.tools.model.ExcelReport;
 import com.linov.xlstools.tools.model.ExcelSheet;
+import com.linov.xlstools.tools.model.ExcelStyle;
 import com.linov.xlstools.tools.model.ExcelTable;
 
 @CrossOrigin(origins = "*")
@@ -37,7 +37,7 @@ public class XlsController {
 	@GetMapping(value = "/write")
 	public ResponseEntity<?> generateReportXls() {
 		try {
-			ExcelReport report = new ExcelReport("ReportTest");
+			ExcelReport report = new ExcelReport("Test");
 			report.addSheet("Test Sheet 1");
 			
 			ExcelSheet sheet = report.getSheet(0);
@@ -46,13 +46,43 @@ public class XlsController {
 			ExcelFooter footer = sheet.getFooter();
 			
 			header.addText("Header 1");
+			header.addText("Header 2");
+			header.addText("Header 3");
+			header.addText("Header 4");
+			header.addText(null);
+			header.removeText(header.getText(2));
 			
 			table.addField("Field 1");
-			List<Object> record = new ArrayList<Object>();
-			record.add("Data 1");
+			table.addField("Field 2");
+			table.addField("Field 3");
+			table.addField("Field 4");
 			
-			table.addRecord(record);
+			List<Object> record1 = new ArrayList<Object>();
+			record1.add("Data 1");
+			record1.add(1);
+			record1.add(LocalDate.now());
+			record1.add(true);
+			
+			List<Object> record2 = new ArrayList<Object>();
+			record2.add("Data 2");
+			record2.add(2);
+			record2.add(LocalDate.now());
+			record2.add(false);
+			
+			table.addRecord(record1);
+			table.addRecord(record2);
+
+			ExcelStyle dateStyle1 = table.getRecord(0).getText("Field 3").getStyle();
+			dateStyle1.setDataFormat("dd/MM/yyyy");
+			ExcelStyle dateStyle2 = table.getRecord(1).getText("Field 3").getStyle();
+			dateStyle2.setDataFormat("dd/MM/yyyy");
+			
+			footer.addText("");
 			footer.addText("Footer 1");
+			footer.addText("Footer 2");
+			footer.addText("Footer 3");
+			footer.addText("Footer 4");
+			footer.removeText(footer.getText(3));
 			
 			report.createFile();
 			

@@ -10,7 +10,7 @@ public class ExcelFooter {
 	private HSSFWorkbook workbook;
 	private List<ExcelText> texts;
 
-	public ExcelFooter(HSSFWorkbook workbook) {
+	protected ExcelFooter(HSSFWorkbook workbook) {
 		this.workbook = workbook;
 		this.texts = new ArrayList<ExcelText>();
 	}
@@ -31,4 +31,13 @@ public class ExcelFooter {
 	public void setTexts(List<ExcelText> texts) {
 		this.texts = texts;
 	}
+
+	public ExcelText removeText(int i) {
+		return this.texts.remove(i);
+	}
+
+	public boolean removeText(ExcelText text) {
+		return this.texts.remove(text);
+	}
+
 }

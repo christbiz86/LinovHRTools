@@ -3,6 +3,7 @@ package com.linov.xlstools.tools.model;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Color;
+import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
@@ -10,8 +11,10 @@ import org.apache.poi.ss.usermodel.VerticalAlignment;
 public class ExcelStyle {
 
 	private CellStyle cellStyle;
+	private CreationHelper creationHelper;
 
 	protected ExcelStyle(HSSFWorkbook workbook) {
+		this.creationHelper = workbook.getCreationHelper();
 		this.cellStyle = workbook.createCellStyle();
 	}
 
@@ -27,7 +30,8 @@ public class ExcelStyle {
 		return this.cellStyle.getIndex();
 	}
 
-	public void setDataFormat(short fmt) {
+	public void setDataFormat(String dateFormat) {
+		short fmt = this.creationHelper.createDataFormat().getFormat(dateFormat);
 		this.cellStyle.setDataFormat(fmt);
 	}
 

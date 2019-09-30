@@ -1,6 +1,6 @@
 package com.linov.xlstools.tools.model;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -9,32 +9,39 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 public class ExcelRecord {
 
 	private HSSFWorkbook workbook;
-	private Map<String, ExcelText> values;
+	private Map<String, ExcelText> record;
 
 	protected ExcelRecord(HSSFWorkbook workbook, List<String> keys, List<Object> values) {
 		this.workbook = workbook;
-		this.values = new HashMap<String, ExcelText>();
+		this.record = new LinkedHashMap<String, ExcelText>();
 		Integer i = 0;
 		for (String key : keys) {
 			ExcelText text = new ExcelText(this.workbook, values.get(i));
-			this.values.put(key, text);
+			this.record.put(key, text);
+			i++;
 		}
 	}
 
 	public Map<String, ExcelText> get() {
-		return values;
+		return record;
 	}
 	
 	public Integer size() {
-		return values.size();
+		return record.size();
 	}
 	
-	public ExcelText getValueOf(String key) {
-		return this.values.get(key);
+	public ExcelText getText(String key) {
+		return this.record.get(key);
 	}
 	
-	public void put(String key, ExcelText text) {
-		this.values.put(key, text);
+	public void set(String key, ExcelText text) {
+		this.record.put(key, text);
+	}
+
+	public void setValue(String key, Object value) {
+		ExcelText text = this.getText(key);
+		text.setValue(value);
+		this.record.put(key, text);
 	}
 
 }

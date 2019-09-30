@@ -9,7 +9,7 @@ public class ExcelSheet {
 	private ExcelTable table;
 	private ExcelFooter footer;
 	
-	public ExcelSheet(HSSFWorkbook workbook, String sheetName) {
+	protected ExcelSheet(HSSFWorkbook workbook, String sheetName) {
 		this.name = sheetName;
 		this.header = new ExcelHeader(workbook);
 		this.table = new ExcelTable(workbook);
